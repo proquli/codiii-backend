@@ -1,5 +1,8 @@
 {
     "version": 2,
+    "functions": {
+    "simple-server.js": {
+      "runtime": "@vercel/node",
     "builds": [
       {
         "src": "simple-server.js",
@@ -13,7 +16,7 @@
       }
     ],
     "env": {
-      "GOOGLE_APP_SCRIPT": "@google_app_script",
+      "GOOGLE_APP_SCRIPT": "https://script.google.com/macros/s/AKfycbzxoyeLm0bpAMm91Q59gWFHDSNA4ueilwaS56s-0HdZpEbDjoHJ2QFeOSrC905SAuTNDQ/exec",
       "FRONTEND_URL": "https://codiii.com"
     }
   }

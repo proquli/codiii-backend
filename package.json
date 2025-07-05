@@ -2,6 +2,7 @@
   "name": "codiii-backend",
   "version": "1.0.0",
   "description": "",
+  "type": "module",
   "main": "simple-server.js",
   "scripts": {
     "start": "node simple-server.js",
