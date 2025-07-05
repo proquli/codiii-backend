@@ -1,0 +1,19 @@
+{
+    "version": 2,
+    "builds": [
+      {
+        "src": "simple-server.js",
+        "use": "@vercel/node"
+      }
+    ],
+    "routes": [
+      {
+        "src": "/(.*)",
+        "dest": "simple-server.js"
+      }
+    ],
+    "env": {
+      "GOOGLE_APP_SCRIPT": "@google_app_script",
+      "FRONTEND_URL": "https://codiii.com"
+    }
+  }
