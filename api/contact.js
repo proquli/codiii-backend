@@ -8,13 +8,15 @@ export default async function handler(req, res) {
   ];
 
   const origin = req.headers.origin;
+  
+  // Set CORS headers
   if (allowedOrigins.includes(origin)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
+  } else {
+    res.setHeader('Access-Control-Allow-Origin', 'https://codiii.com'); // fallback
   }
 
-  // Enable CORS
   res.setHeader('Access-Control-Allow-Credentials', 'true');
-  // REMOVED: res.setHeader('Access-Control-Allow-Origin', '*'); ← This was overriding the correct origin
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
   res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
 
@@ -33,7 +35,7 @@ export default async function handler(req, res) {
     console.log('Form submission received:', {
       email: formData.email,
       timestamp: new Date().toISOString(),
-      ip: req.headers['x-forwarded-for'] || 'unknown'
+      ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress || 'unknown'
     });
 
     // Validate required environment variable
@@ -63,7 +65,7 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         ...formData,
         userAgent: req.headers['user-agent'],
-        ipAddress: req.headers['x-forwarded-for'] || 'unknown',
+        ipAddress: req.headers['x-forwarded-for'] || req.connection.remoteAddress || 'unknown',
         timestamp: new Date().toISOString()
       })
     });
