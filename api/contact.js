@@ -1,4 +1,4 @@
-export default function handler(req, res) {
+export default async function handler(req, res) {
   // Set CORS headers for your domains
   const allowedOrigins = [
     'https://codiii.com',
@@ -33,6 +33,15 @@ export default function handler(req, res) {
       origin: origin
     });
 
+    // Validate required environment variable
+    if (!process.env.GOOGLE_APP_SCRIPT) {
+      console.error('GOOGLE_APP_SCRIPT environment variable not set');
+      return res.status(500).json({
+        status: 'error',
+        message: 'Server configuration error'
+      });
+    }
+
     // Validate required fields
     if (!formData.email || !formData.firstName || !formData.lastName) {
       return res.status(400).json({
@@ -41,20 +50,33 @@ export default function handler(req, res) {
       });
     }
 
-    // For now, return success without Google Apps Script
-    // We'll add that back once basic form is working
-    res.status(200).json({
-      status: 'success',
-      message: 'Form received successfully!',
-      data: {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-        company: formData.company,
-        role: formData.role
+    // Forward to Google Apps Script
+    const fetch = (await import('node-fetch')).default;
+    const response = await fetch(process.env.GOOGLE_APP_SCRIPT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
-      timestamp: new Date().toISOString()
+      body: JSON.stringify({
+        ...formData,
+        userAgent: req.headers['user-agent'],
+        ipAddress: req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || 'unknown',
+        timestamp: new Date().toISOString()
+      })
     });
+
+    if (!response.ok) {
+      console.error('Google Apps Script error:', response.status, response.statusText);
+      return res.status(500).json({
+        status: 'error',
+        message: 'Form submission failed'
+      });
+    }
+
+    const result = await response.json();
+    console.log('Google Apps Script response:', result);
+
+    res.status(200).json(result);
 
   } catch (error) {
     console.error('Contact form error:', error);
