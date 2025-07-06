@@ -9,7 +9,7 @@ export default async function handler(req, res) {
 
   const origin = req.headers.origin;
   
-  // Set CORS headers
+  // Always set CORS headers first
   if (allowedOrigins.includes(origin)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
   } else {
@@ -20,7 +20,9 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
   res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
 
+  // Handle preflight requests
   if (req.method === 'OPTIONS') {
+    console.log('Preflight request received from:', origin);
     res.status(200).end();
     return;
   }

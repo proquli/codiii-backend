@@ -1,5 +1,10 @@
 {
   "version": 2,
+  "functions": {
+    "api/*.js": {
+      "runtime": "nodejs18.x"
+    }
+  },
   "env": {
     "GOOGLE_APP_SCRIPT": "https://script.google.com/macros/s/AKfycbzxoyeLm0bpAMm91Q59gWFHDSNA4ueilwaS56s-0HdZpEbDjoHJ2QFeOSrC905SAuTNDQ/exec",
     "FRONTEND_URL": "https://codiii.com"
