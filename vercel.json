@@ -1,22 +1,7 @@
 {
-    "version": 2,
-    "functions": {
-    "simple-server.js": {
-      "runtime": "@vercel/node",
-    "builds": [
-      {
-        "src": "simple-server.js",
-        "use": "@vercel/node"
-      }
-    ],
-    "routes": [
-      {
-        "src": "/(.*)",
-        "dest": "simple-server.js"
-      }
-    ],
-    "env": {
-      "GOOGLE_APP_SCRIPT": "https://script.google.com/macros/s/AKfycbzxoyeLm0bpAMm91Q59gWFHDSNA4ueilwaS56s-0HdZpEbDjoHJ2QFeOSrC905SAuTNDQ/exec",
-      "FRONTEND_URL": "https://codiii.com"
-    }
+  "version": 2,
+  "env": {
+    "GOOGLE_APP_SCRIPT": "https://script.google.com/macros/s/AKfycbzxoyeLm0bpAMm91Q59gWFHDSNA4ueilwaS56s-0HdZpEbDjoHJ2QFeOSrC905SAuTNDQ/exec",
+    "FRONTEND_URL": "https://codiii.com"
   }
+}
