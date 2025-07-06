@@ -1,17 +1,9 @@
 {
   "name": "codiii-backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "simple-server.js",
-  "scripts": {
-    "start": "node simple-server.js",
-    "dev": "nodemon simple-server.js"
-  },
+  "type": "module",
   "dependencies": {
-    "dotenv": "^17.0.1",
     "node-fetch": "^3.3.2"
   },
-  "devDependencies": {
-    "nodemon": "^3.1.10"
-  }
+  "scripts": {}
 }
