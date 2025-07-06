@@ -1,35 +1,20 @@
-export default async function handler(req, res) {
-  // Set CORS headers for ALL requests (including OPTIONS)
-  const allowedOrigins = [
-    'http://localhost:5173',
-    'http://localhost:3000', 
-    'https://codiii.com',
-    'https://www.codiii.com',
-    'https://www.google.com' // For testing
-  ];
+export default function handler(req, res) {
+  // Set CORS headers immediately - BEFORE any other logic
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
-  const origin = req.headers.origin;
-  
-  // Always set CORS headers
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  } else {
-    // For testing, allow any origin temporarily
-    res.setHeader('Access-Control-Allow-Origin', '*');
-  }
+  console.log('Contact endpoint - Method:', req.method);
+  console.log('Contact endpoint - Origin:', req.headers.origin);
 
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST,PUT,DELETE');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-
-  // Handle preflight (OPTIONS) requests
+  // Handle preflight OPTIONS request
   if (req.method === 'OPTIONS') {
-    console.log('OPTIONS preflight request from:', origin);
+    console.log('Contact: Handling OPTIONS preflight');
     res.status(200).end();
     return;
   }
 
-  // Only allow POST for actual requests
+  // Only allow POST
   if (req.method !== 'POST') {
     return res.status(405).json({ status: 'error', message: 'Method not allowed' });
   }
@@ -39,21 +24,10 @@ export default async function handler(req, res) {
     
     console.log('Form submission received:', {
       email: formData.email,
-      timestamp: new Date().toISOString(),
-      origin: origin,
-      ip: req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || 'unknown'
+      timestamp: new Date().toISOString()
     });
 
-    // Validate required environment variable
-    if (!process.env.GOOGLE_APP_SCRIPT) {
-      console.error('GOOGLE_APP_SCRIPT environment variable not set');
-      return res.status(500).json({
-        status: 'error',
-        message: 'Server configuration error'
-      });
-    }
-
-    // Validate request body
+    // Basic validation
     if (!formData.email || !formData.firstName || !formData.lastName) {
       return res.status(400).json({
         status: 'error',
@@ -61,33 +35,20 @@ export default async function handler(req, res) {
       });
     }
 
-    // Forward to Google Apps Script
-    const fetch = (await import('node-fetch')).default;
-    const response = await fetch(process.env.GOOGLE_APP_SCRIPT, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+    // For now, just return success without calling Google Apps Script
+    // We'll add that back once CORS is working
+    res.status(200).json({
+      status: 'success',
+      message: 'Form received successfully (test mode)',
+      data: {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        company: formData.company,
+        role: formData.role
       },
-      body: JSON.stringify({
-        ...formData,
-        userAgent: req.headers['user-agent'],
-        ipAddress: req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || 'unknown',
-        timestamp: new Date().toISOString()
-      })
+      timestamp: new Date().toISOString()
     });
-
-    if (!response.ok) {
-      console.error('Google Apps Script error:', response.status, response.statusText);
-      return res.status(500).json({
-        status: 'error',
-        message: 'Form submission failed'
-      });
-    }
-
-    const result = await response.json();
-    console.log('Google Apps Script response:', result);
-
-    res.status(200).json(result);
 
   } catch (error) {
     console.error('Contact form error:', error);
