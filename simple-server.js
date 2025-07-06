@@ -1,7 +1,9 @@
-// simple-server.js
-require('dotenv').config();
-const http = require('http');
-const { URL } = require('url');
+// simple-server.js - ES Module version
+import dotenv from 'dotenv';
+import http from 'http';
+import { URL } from 'url';
+
+dotenv.config();
 
 const PORT = process.env.PORT || 3001;
 
