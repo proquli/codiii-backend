@@ -1,32 +1,35 @@
 export default async function handler(req, res) {
-  // Enable CORS for production
+  // Set CORS headers for ALL requests (including OPTIONS)
   const allowedOrigins = [
     'http://localhost:5173',
     'http://localhost:3000', 
     'https://codiii.com',
-    'https://www.codiii.com'
+    'https://www.codiii.com',
+    'https://www.google.com' // For testing
   ];
 
   const origin = req.headers.origin;
   
-  // Always set CORS headers first
+  // Always set CORS headers
   if (allowedOrigins.includes(origin)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
   } else {
-    res.setHeader('Access-Control-Allow-Origin', 'https://codiii.com'); // fallback
+    // For testing, allow any origin temporarily
+    res.setHeader('Access-Control-Allow-Origin', '*');
   }
 
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST,PUT,DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
 
-  // Handle preflight requests
+  // Handle preflight (OPTIONS) requests
   if (req.method === 'OPTIONS') {
-    console.log('Preflight request received from:', origin);
+    console.log('OPTIONS preflight request from:', origin);
     res.status(200).end();
     return;
   }
 
+  // Only allow POST for actual requests
   if (req.method !== 'POST') {
     return res.status(405).json({ status: 'error', message: 'Method not allowed' });
   }
@@ -37,7 +40,8 @@ export default async function handler(req, res) {
     console.log('Form submission received:', {
       email: formData.email,
       timestamp: new Date().toISOString(),
-      ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress || 'unknown'
+      origin: origin,
+      ip: req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || 'unknown'
     });
 
     // Validate required environment variable
@@ -67,7 +71,7 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         ...formData,
         userAgent: req.headers['user-agent'],
-        ipAddress: req.headers['x-forwarded-for'] || req.connection.remoteAddress || 'unknown',
+        ipAddress: req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || 'unknown',
         timestamp: new Date().toISOString()
       })
     });
