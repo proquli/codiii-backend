@@ -1,20 +1,25 @@
 export default function handler(req, res) {
-  // Set CORS headers immediately - BEFORE any other logic
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  // Set CORS headers for your domains
+  const allowedOrigins = [
+    'https://codiii.com',
+    'https://www.codiii.com',
+    'http://localhost:5173',
+    'http://localhost:3000'
+  ];
+  
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+  
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-
-  console.log('Contact endpoint - Method:', req.method);
-  console.log('Contact endpoint - Origin:', req.headers.origin);
-
-  // Handle preflight OPTIONS request
+  
   if (req.method === 'OPTIONS') {
-    console.log('Contact: Handling OPTIONS preflight');
     res.status(200).end();
     return;
   }
 
-  // Only allow POST
   if (req.method !== 'POST') {
     return res.status(405).json({ status: 'error', message: 'Method not allowed' });
   }
@@ -24,10 +29,11 @@ export default function handler(req, res) {
     
     console.log('Form submission received:', {
       email: formData.email,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      origin: origin
     });
 
-    // Basic validation
+    // Validate required fields
     if (!formData.email || !formData.firstName || !formData.lastName) {
       return res.status(400).json({
         status: 'error',
@@ -35,11 +41,11 @@ export default function handler(req, res) {
       });
     }
 
-    // For now, just return success without calling Google Apps Script
-    // We'll add that back once CORS is working
+    // For now, return success without Google Apps Script
+    // We'll add that back once basic form is working
     res.status(200).json({
       status: 'success',
-      message: 'Form received successfully (test mode)',
+      message: 'Form received successfully!',
       data: {
         firstName: formData.firstName,
         lastName: formData.lastName,
