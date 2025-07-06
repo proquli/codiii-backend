@@ -1,29 +1,19 @@
 export default function handler(req, res) {
-  // Use the same CORS pattern as your working health.js
-  const allowedOrigins = [
-    'http://localhost:5173',
-    'https://codiii.com',
-    'https://www.codiii.com',
-    'https://www.google.com'  // Add Google for testing
-  ];
-  
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  }
-  
+  // Set CORS headers for ALL requests
+  res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   
+  // Handle preflight
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return;
   }
   
+  // Handle both GET and POST
   res.status(200).json({ 
-    message: 'Simple test works!', 
+    status: 'ok', 
     method: req.method,
-    origin: origin,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString() 
   });
 }
